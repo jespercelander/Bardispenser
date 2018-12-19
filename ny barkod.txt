@@ -1,0 +1,325 @@
+#include <Servo.h>  
+#include <LiquidCrystal.h>
+
+LiquidCrystal lcd(49, 47, 45, 43, 41, 39);
+
+const int pump1 = 2;      
+const int pump2 = 3;      
+const int pump3 = 4;      
+const int pump4 = 5;
+
+const int SERVO1 = 37;      
+const int SERVO2 = 35;     
+const int SERVO3 = 33;
+const int SERVO4 = 31;
+
+Servo servo1;         
+Servo servo2;               
+Servo servo3;
+Servo servo4;
+
+const int Led1 = 52;
+const int Led2 = 53;
+const int BLINK = 1000;
+const int EMPTYTIME = 30000;
+const int STARTFILL = 10000;
+
+//funktionsprototyper
+void start();
+void done();
+void fillPumps();
+void emptyAll();
+
+//***************************************************************************************
+void setup()
+{
+  Serial.begin(9600);
+  if (Serial.available()>= 0)
+  {                           
+    lcd.begin(16, 2);
+    lcd.setCursor(0,1);
+    lcd.print("Please order!");
+  }
+  pinMode(pump1, OUTPUT);
+  pinMode(pump2, OUTPUT);
+  pinMode(pump3, OUTPUT);
+  pinMode(pump4, OUTPUT);
+  
+  pinMode(Led1, OUTPUT);
+  pinMode(Led2, OUTPUT);
+
+  digitalWrite(pump1, LOW);
+  digitalWrite(pump2, LOW);
+  digitalWrite(pump3, LOW);
+  digitalWrite(pump4, LOW);
+}
+
+//****************************************************************************************
+void loop()
+{
+  if (Serial.available()>0)
+  {                           
+    char data = Serial.read();
+    switch (data)
+    {
+      case 'a':          
+      {
+        start();
+        
+        digitalWrite(pump1, HIGH);
+        delay(40000);
+        digitalWrite(pump1, LOW);
+        
+        servo1.attach(SERVO1);
+        delay(10);
+        servo1.write(115);     // Tell servo to go to 115 degrees (start position)
+        delay(10);
+        servo1.write(0);       //Open the ball valve
+        delay(12000);
+        servo1.write(115);     //Back to start position (close the ball valve)
+        delay(2000);
+        servo1.detach();
+        delay(1000);
+        
+        done();
+        break;
+      }
+      case 'b':          
+      {
+        start();
+        
+        digitalWrite(pump2, HIGH);
+        delay(60000);
+        digitalWrite(pump2, LOW);
+        
+        servo2.attach(SERVO2);
+        delay(10);
+        servo2.write(115);    
+        delay(10);
+        servo2.write(0);
+        delay(12000);
+        servo2.write(115);
+        delay(10);
+        servo2.detach();
+        delay(1000);
+        
+        done();
+        break;
+      }
+      case 'c':                   
+      {
+        start();
+        
+        digitalWrite(pump3, HIGH);
+        delay(40000);             
+        digitalWrite(pump3, LOW);
+        
+        servo3.attach(SERVO3);
+        delay(10);
+        servo3.write(100);    
+        delay(10);
+        servo3.write(185);
+        delay(12000);
+        servo3.write(100);
+        delay(10);
+        servo3.detach();
+        delay(1000);
+        
+        done();
+        break;
+      } 
+      case 'd':                          
+      {
+        start();
+        
+        digitalWrite(pump4, HIGH);
+        delay(60000);
+        digitalWrite(pump4, LOW);
+        
+        servo4.attach(SERVO4);
+        delay(10);
+        servo4.write(100);    
+        delay(10);
+        servo4.write(185);
+        delay(12000);
+        servo4.write(100);
+        delay(10);
+        servo4.detach();
+        delay(1000);
+        
+        done();
+        break;
+      }
+    }
+  }
+}
+void start()
+{
+   lcd.setCursor(0,1);
+   lcd.print("Wait...");
+        
+   digitalWrite(Led1, HIGH);
+   digitalWrite(Led2, HIGH);
+   delay(1000);
+}
+void done()
+{
+  lcd.setCursor(0,1);
+  lcd.print("Done!");
+  
+  digitalWrite(Led1, LOW);
+  delay(BLINK);
+  digitalWrite(Led1, HIGH);
+  digitalWrite(Led2, LOW);
+  delay(BLINK);
+  digitalWrite(Led1, LOW);
+  digitalWrite(Led2, HIGH);
+  delay(BLINK);
+  digitalWrite(Led1, HIGH);
+  digitalWrite(Led2, LOW);
+  delay(BLINK);
+  digitalWrite(Led1, LOW);
+}
+void fillPumps()
+{
+  Serial.println("Ställ en slaskbägare under kranen.");
+  delay(2000);
+  digitalWrite(pump1, HIGH);
+  delay(STARTFILL);
+  digitalWrite(pump1, LOW);
+  delay(1500);
+  digitalWrite(pump2, HIGH);
+  delay(STARTFILL);
+  digitalWrite(pump2, LOW);
+  delay(1500);
+  digitalWrite(pump3, HIGH);
+  delay(STARTFILL);
+  digitalWrite(pump3, LOW);
+  delay(1500);
+  digitalWrite(pump4, HIGH);
+  delay(STARTFILL);
+  digitalWrite(pump4, LOW);
+  delay(1500);
+}
+void emptyAll()
+{
+  //servo 1
+  lcd.setCursor(0,1);
+  lcd.print("cleaning servo 1");
+  servo1.attach(SERVO1);
+  servo1.write(100);    
+  delay(EMPTYTIME);
+  servo1.write(185);
+  lcd.setCursor(0,0);
+  lcd.print("Replace with");
+  lcd.setCursor(0,1);
+  lcd.print("freshwater");
+  delay(EMPTYTIME);
+  servo1.write(100);    
+  delay(EMPTYTIME);
+  servo1.write(185);
+  servo1.detach();  
+  
+  //servo 2
+  lcd.setCursor(0,1);
+  lcd.print("cleaning servo 2");
+  servo2.attach(SERVO2);
+  servo2.write(100);    
+  delay(EMPTYTIME);
+  servo2.write(185);
+  lcd.setCursor(0,0);
+  lcd.print("Replace with");
+  lcd.setCursor(0,1);
+  lcd.print("freshwater");
+  delay(EMPTYTIME);
+  servo2.write(100);    
+  delay(EMPTYTIME);
+  servo2.write(185);
+  servo2.detach();
+
+  //servo 3
+  lcd.setCursor(0,1);
+  lcd.print("cleaning servo 3");
+  servo3.attach(SERVO3);
+  servo3.write(100);    
+  delay(EMPTYTIME);
+  servo3.write(185);
+  lcd.setCursor(0,0);
+  lcd.print("Replace with");
+  lcd.setCursor(0,1);
+  lcd.print("freshwater");
+  delay(EMPTYTIME);
+  servo3.write(100);    
+  delay(EMPTYTIME);
+  servo3.write(185);
+  servo3.detach();
+
+  //servo 4
+  lcd.setCursor(0,1);
+  lcd.print("cleaning servo 4");
+  servo4.attach(SERVO4);
+  servo4.write(100);    
+  delay(EMPTYTIME);
+  servo4.write(185);
+  lcd.setCursor(0,0);
+  lcd.print("Replace with");
+  lcd.setCursor(0,1);
+  lcd.print("freshwater");
+  delay(EMPTYTIME);
+  servo4.write(100);    
+  delay(EMPTYTIME);
+  servo4.write(185);
+  servo4.detach();
+      
+  //pump 1
+  lcd.setCursor(0,1);
+  lcd.print("Cleaning pump 1");
+  digitalWrite(pump1, HIGH);
+  delay(EMPTYTIME);
+  digitalWrite(pump1, LOW);
+  lcd.setCursor(0,0);
+  lcd.print("Replace with");
+  lcd.setCursor(0,1);
+  lcd.print("freshwater");
+  delay(EMPTYTIME);
+      
+  //pump 2
+  lcd.setCursor(0,1);
+  lcd.print("Cleaning pump 2");
+  digitalWrite(pump2, HIGH);
+  delay(EMPTYTIME);
+  digitalWrite(pump2, LOW);
+  lcd.setCursor(0,0);
+  lcd.print("Replace with");
+  lcd.setCursor(0,1);
+  lcd.print("freshwater");
+  delay(EMPTYTIME);
+      
+  //pump 3
+  lcd.setCursor(0,1);
+  lcd.print("Cleaning pump 3");
+  digitalWrite(pump3, HIGH);
+  delay(EMPTYTIME);
+  digitalWrite(pump3, LOW);
+  lcd.setCursor(0,0);
+  lcd.print("Replace with");
+  lcd.setCursor(0,1);
+  lcd.print("freshwater");
+  delay(EMPTYTIME);
+  
+  //pump 4
+  lcd.setCursor(0,1);
+  lcd.print("Cleaning pump 4");
+  digitalWrite(pump4, HIGH);
+  delay(EMPTYTIME);
+  digitalWrite(pump4, LOW);
+  lcd.setCursor(0,0);
+  lcd.print("Replace with");
+  lcd.setCursor(0,1);
+  lcd.print("freshwater");
+  delay(EMPTYTIME);
+
+  done();
+}
+
+
